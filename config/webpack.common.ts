@@ -5,7 +5,6 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import Dotenv from 'dotenv-webpack'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
-import WorkboxPlugin from 'workbox-webpack-plugin'
 
 export interface WebpackEnv {
   mode?: string
@@ -38,11 +37,6 @@ export const getCommonConfig = (
         template: join(resolve('src'), 'index.html'),
       }),
       new ForkTsCheckerWebpackPlugin(),
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-        navigateFallback: 'index.html',
-      }),
     ],
   }
 }
