@@ -4,8 +4,13 @@ import { getCommonConfig } from './webpack.common'
 import { Configuration as WebpackConfiguration } from 'webpack'
 import 'webpack-dev-server'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
+import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server'
 
-export const getDevConfig = (): WebpackConfiguration => ({
+interface Configuration extends WebpackConfiguration {
+  devServer?: WebpackDevServerConfiguration
+}
+
+export const getDevConfig = (): Configuration => ({
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
@@ -16,7 +21,7 @@ export const getDevConfig = (): WebpackConfiguration => ({
     compress: true,
     overlay: true,
     historyApiFallback: {
-      index: 'index.html',
+      index: '/',
     },
     publicPath: '/',
   },
@@ -28,14 +33,16 @@ export const getDevConfig = (): WebpackConfiguration => ({
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.tsx?$/,
+        test: /\.(j|t)sx?$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            envName: 'dev',
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              envName: 'dev',
+            },
           },
-        },
+        ],
       },
     ],
   },

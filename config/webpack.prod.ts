@@ -1,8 +1,9 @@
 import merge from 'webpack-merge'
 import { getCommonConfig } from './webpack.common'
-// import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
-// import TerserJSPlugin from 'terser-webpack-plugin'
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
+import TerserJSPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import SentryWebpackPlugin from '@sentry/webpack-plugin'
 import {
   Configuration as WebpackConfiguration,
   EnvironmentPlugin,
@@ -10,9 +11,9 @@ import {
 
 export const getProdConfig = (): WebpackConfiguration => ({
   mode: 'production',
-  // optimization: {
-  //   minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
-  // },
+  optimization: {
+    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+  },
   module: {
     rules: [
       {
@@ -28,12 +29,14 @@ export const getProdConfig = (): WebpackConfiguration => ({
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            envName: 'prod',
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              envName: 'prod',
+            },
           },
-        },
+        ],
       },
     ],
   },
@@ -59,6 +62,17 @@ export const getProdConfig = (): WebpackConfiguration => ({
     //   chunkFilename: '[id].css',
     //   ignoreOrder: false,
     // }),
+    ...(process.env.SENTRY_AUTH_TOKEN
+      ? [
+          new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: 'curbee',
+            project: 'curbee-consumer',
+            include: '.',
+            ignore: ['node_modules', 'webpack.config.js'],
+          }),
+        ]
+      : []),
   ],
 })
 
